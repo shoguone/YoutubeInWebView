@@ -13,6 +13,8 @@ namespace YoutubeInWebView
         public MainPage()
         {
             InitializeComponent();
+
+            Webview.RegisterAction(data => DisplayAlert("Alert", "Hello " + data, "OK"));
         }
     }
 }
