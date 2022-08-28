@@ -1,9 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Xamarin.Forms;
 
 namespace YoutubeInWebView
@@ -14,7 +9,24 @@ namespace YoutubeInWebView
         {
             InitializeComponent();
 
-            Webview.RegisterAction(data => DisplayAlert("Alert", "Hello " + data, "OK"));
+            PlayButton.Clicked += PlayButton_Clicked;
+            PauseButton.Clicked += PauseButton_Clicked;
+            StopButton.Clicked += StopButton_Clicked;
+        }
+
+        private void PlayButton_Clicked(object sender, EventArgs e)
+        {
+            Webview.PlayVideo();
+        }
+
+        private void PauseButton_Clicked(object sender, EventArgs e)
+        {
+            Webview.PauseVideo();
+        }
+
+        private void StopButton_Clicked(object sender, EventArgs e)
+        {
+            Webview.StopVideo();
         }
     }
 }

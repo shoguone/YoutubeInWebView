@@ -8,22 +8,46 @@ namespace YoutubeInWebView.Droid.Javascript
 {
     public class JSBridge : Java.Lang.Object
     {
-        readonly WeakReference<HybridWebViewRenderer> hybridWebViewRenderer;
+        readonly WeakReference<YoutubeWebViewRenderer> hybridWebViewRenderer;
 
-        public JSBridge(HybridWebViewRenderer hybridRenderer)
+        public JSBridge(YoutubeWebViewRenderer hybridRenderer)
         {
-            hybridWebViewRenderer = new WeakReference<HybridWebViewRenderer>(hybridRenderer);
+            hybridWebViewRenderer = new WeakReference<YoutubeWebViewRenderer>(hybridRenderer);
         }
 
         [JavascriptInterface]
-        [Export("invokeAction")]
-        public void InvokeAction(string data)
+        [Export("onApiReady")]
+        public void OnApiReady()
         {
-            HybridWebViewRenderer hybridRenderer;
+            YoutubeWebViewRenderer hybridRenderer;
 
             if (hybridWebViewRenderer != null && hybridWebViewRenderer.TryGetTarget(out hybridRenderer))
             {
-                ((HybridWebView)hybridRenderer.Element).InvokeAction(data);
+                hybridRenderer.SetupPlayer();
+            }
+        }
+
+        [JavascriptInterface]
+        [Export("onPlayerReady")]
+        public void OnPlayerReady()
+        {
+            YoutubeWebViewRenderer hybridRenderer;
+
+            if (hybridWebViewRenderer != null && hybridWebViewRenderer.TryGetTarget(out hybridRenderer))
+            {
+                ((YoutubeWebView)hybridRenderer.Element).InvokeOnPlayerReady();
+            }
+        }
+
+        [JavascriptInterface]
+        [Export("onPlayerStateChange")]
+        public void OnPlayerStateChange(int state)
+        {
+            YoutubeWebViewRenderer hybridRenderer;
+
+            if (hybridWebViewRenderer != null && hybridWebViewRenderer.TryGetTarget(out hybridRenderer))
+            {
+                ((YoutubeWebView)hybridRenderer.Element).InvokeOnPlayerStateChange((PlayerState)state);
             }
         }
     }

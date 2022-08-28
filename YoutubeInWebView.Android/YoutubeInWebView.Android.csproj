@@ -61,10 +61,9 @@
   <ItemGroup>
     <Compile Include="Javascript\JSBridge.cs" />
     <Compile Include="MainActivity.cs" />
-    <Compile Include="Renderer\HybridWebViewRenderer.cs" />
+    <Compile Include="Renderer\YoutubeWebViewRenderer.cs" />
     <Compile Include="Resources\Resource.designer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Javascript\JavascriptWebViewClient.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
@@ -103,7 +102,7 @@
     <AndroidAsset Include="Assets\Content\index.html" />
   </ItemGroup>
   <ItemGroup>
-    <AndroidAsset Include="Assets\Content\yt1.html" />
+    <AndroidAsset Include="Assets\Content\youtube-player.js" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
 </Project>

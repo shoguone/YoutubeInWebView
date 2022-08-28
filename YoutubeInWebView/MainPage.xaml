@@ -4,6 +4,11 @@
              xmlns:controls="clr-namespace:YoutubeInWebView.UI.Controls"
              x:Class="YoutubeInWebView.MainPage">
 
-    <controls:HybridWebView x:Name="Webview" Uri="yt1.html"></controls:HybridWebView>
+    <StackLayout>
+        <controls:YoutubeWebView x:Name="Webview" YoutubeVideoId="junBvKGZCDc" WidthRequest="400" HeightRequest="600"></controls:YoutubeWebView>
+        <Button Text="Play" x:Name="PlayButton" />
+        <Button Text="Pause" x:Name="PauseButton" />
+        <Button Text="Stop" x:Name="StopButton" />
+    </StackLayout>
 
 </ContentPage>
