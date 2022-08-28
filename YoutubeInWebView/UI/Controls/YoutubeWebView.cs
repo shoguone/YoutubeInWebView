@@ -11,6 +11,11 @@ namespace YoutubeInWebView.UI.Controls
         public const string StopVideoMessage = "StopVideo";
         public const string SeekToMessage = "SeekTo";
         public const string ClearVideoMessage = "ClearVideo";
+
+        public const string NextVideoMessage = "NextVideo";
+        public const string PreviousVideoMessage = "PreviousVideo";
+        public const string PlayVideoAtMessage = "PlayVideoAt";
+
         public const string CueVideoByIdMessage = "CueVideoById";
         public const string LoadVideoByIdMessage = "LoadVideoById";
         public const string CueVideoByUrlMessage = "CueVideoByUrl";
@@ -23,6 +28,18 @@ namespace YoutubeInWebView.UI.Controls
             returnType: typeof(string),
             declaringType: typeof(YoutubeWebView),
             defaultValue: default(string));
+
+        public static readonly BindableProperty VolumeProperty = BindableProperty.Create(
+            propertyName: nameof(Volume),
+            returnType: typeof(int),
+            declaringType: typeof(YoutubeWebView),
+            defaultValue: 100);
+
+        public static readonly BindableProperty IsMutedProperty = BindableProperty.Create(
+            propertyName: nameof(IsMuted),
+            returnType: typeof(bool),
+            declaringType: typeof(YoutubeWebView),
+            defaultValue: false);
 
         public event EventHandler OnPlayerReady;
         public event EventHandler<PlayerState> OnPlayerStateChange;
@@ -41,6 +58,18 @@ namespace YoutubeInWebView.UI.Controls
         {
             get { return (string)GetValue(YoutubeVideoIdProperty); }
             set { SetValue(YoutubeVideoIdProperty, value); }
+        }
+
+        public int Volume
+        {
+            get { return (int)GetValue(VolumeProperty); }
+            set { SetValue(VolumeProperty, value); }
+        }
+
+        public bool IsMuted
+        {
+            get { return (bool)GetValue(IsMutedProperty); }
+            set { SetValue(IsMutedProperty, value); }
         }
 
         /// <summary>
@@ -98,15 +127,32 @@ namespace YoutubeInWebView.UI.Controls
             MessagingCenter.Instance.Send(this, StopVideoMessage);
         }
 
-        public void SeekTo()
+        public void SeekTo(SeekToCmd command)
         {
-            MessagingCenter.Instance.Send(this, SeekToMessage);
+            MessagingCenter.Instance.Send(this, SeekToMessage, command);
         }
 
         public void ClearVideo()
         {
             MessagingCenter.Instance.Send(this, ClearVideoMessage);
         }
+
+
+        public void NextVideo()
+        {
+            MessagingCenter.Instance.Send(this, NextVideoMessage);
+        }
+
+        public void PreviousVideo()
+        {
+            MessagingCenter.Instance.Send(this, PreviousVideoMessage);
+        }
+
+        public void PlayVideoAt(int index)
+        {
+            MessagingCenter.Instance.Send(this, PlayVideoAtMessage, index);
+        }
+
 
         public void CueVideoById(LoadVideoByIdCmd command)
         {

@@ -1,11 +1,11 @@
-﻿using Android.Content;
+﻿using System.ComponentModel;
+using Android.Content;
+using Newtonsoft.Json;
 using Xamarin.Forms;
 using Xamarin.Forms.Platform.Android;
 using YoutubeInWebView.Droid.Renderer;
 using YoutubeInWebView.Droid.Javascript;
 using YoutubeInWebView.UI.Controls;
-using System.ComponentModel;
-using Newtonsoft.Json;
 using YoutubeInWebView.UI.Controls.Commands;
 
 [assembly: ExportRenderer(typeof(YoutubeWebView), typeof(YoutubeWebViewRenderer))]
@@ -26,7 +26,7 @@ namespace YoutubeInWebView.Droid.Renderer
 
         public void SetupPlayer()
         {
-            Device.BeginInvokeOnMainThread(() => 
+            Device.BeginInvokeOnMainThread(() =>
                 Control.EvaluateJavascript($"setUpPlayer('{_HybridWebView.YoutubeVideoId}', {(int)_HybridWebView.Width}, {(int)_HybridWebView.Height})", null));
         }
 
@@ -47,6 +47,24 @@ namespace YoutubeInWebView.Droid.Renderer
         protected override void OnElementPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             base.OnElementPropertyChanged(sender, e);
+
+            if (e.PropertyName == nameof(YoutubeWebView.Width))
+            {
+                ExecuteSetSizeJs((int)_HybridWebView.Width, (int)_HybridWebView.Height);
+            }
+            else if (e.PropertyName == nameof(YoutubeWebView.Height))
+            {
+                ExecuteSetSizeJs((int)_HybridWebView.Width, (int)_HybridWebView.Height);
+            }
+
+            else if (e.PropertyName == nameof(YoutubeWebView.Volume))
+            {
+                ExecuteSetVolumeJs(_HybridWebView.Volume);
+            }
+            else if (e.PropertyName == nameof(YoutubeWebView.IsMuted))
+            {
+                SetIsMutedJs(_HybridWebView.IsMuted);
+            }
         }
 
         protected override void Dispose(bool disposing)
@@ -77,8 +95,15 @@ namespace YoutubeInWebView.Droid.Renderer
             MessagingCenter.Instance.Subscribe<YoutubeWebView>(this, YoutubeWebView.PlayVideoMessage, v => ExecutePlayVideoJs());
             MessagingCenter.Instance.Subscribe<YoutubeWebView>(this, YoutubeWebView.PauseVideoMessage, v => ExecutePauseVideoJs());
             MessagingCenter.Instance.Subscribe<YoutubeWebView>(this, YoutubeWebView.StopVideoMessage, v => ExecuteStopVideoJs());
-            MessagingCenter.Instance.Subscribe<YoutubeWebView>(this, YoutubeWebView.SeekToMessage, v => ExecuteSeekToJs());
+            MessagingCenter.Instance.Subscribe<YoutubeWebView, SeekToCmd>(
+                this, YoutubeWebView.SeekToMessage, (v, cmd) => ExecuteSeekToJs(cmd));
             MessagingCenter.Instance.Subscribe<YoutubeWebView>(this, YoutubeWebView.ClearVideoMessage, v => ExecuteClearVideoJs());
+
+            MessagingCenter.Instance.Subscribe<YoutubeWebView>(this, YoutubeWebView.NextVideoMessage, v => ExecuteNextVideoJs());
+            MessagingCenter.Instance.Subscribe<YoutubeWebView>(this, YoutubeWebView.PreviousVideoMessage, v => ExecutePreviousVideoJs());
+            MessagingCenter.Instance.Subscribe<YoutubeWebView, int>(
+                this, YoutubeWebView.PlayVideoAtMessage, (v, i) => ExecutePlayVideoAtJs(i));
+
             MessagingCenter.Instance.Subscribe<YoutubeWebView, LoadVideoByIdCmd>(
                 this, YoutubeWebView.CueVideoByIdMessage, (v, cmd) => ExecuteCueVideoByIdJs(cmd));
             MessagingCenter.Instance.Subscribe<YoutubeWebView, LoadVideoByIdCmd>(
@@ -98,8 +123,13 @@ namespace YoutubeInWebView.Droid.Renderer
             MessagingCenter.Instance.Unsubscribe<YoutubeWebView>(this, YoutubeWebView.PlayVideoMessage);
             MessagingCenter.Instance.Unsubscribe<YoutubeWebView>(this, YoutubeWebView.PauseVideoMessage);
             MessagingCenter.Instance.Unsubscribe<YoutubeWebView>(this, YoutubeWebView.StopVideoMessage);
-            MessagingCenter.Instance.Unsubscribe<YoutubeWebView>(this, YoutubeWebView.SeekToMessage);
+            MessagingCenter.Instance.Unsubscribe<YoutubeWebView, SeekToCmd>(this, YoutubeWebView.SeekToMessage);
             MessagingCenter.Instance.Unsubscribe<YoutubeWebView>(this, YoutubeWebView.ClearVideoMessage);
+
+            MessagingCenter.Instance.Unsubscribe<YoutubeWebView>(this, YoutubeWebView.NextVideoMessage);
+            MessagingCenter.Instance.Unsubscribe<YoutubeWebView>(this, YoutubeWebView.PreviousVideoMessage);
+            MessagingCenter.Instance.Unsubscribe<YoutubeWebView, int>(this, YoutubeWebView.PlayVideoAtMessage);
+
             MessagingCenter.Instance.Unsubscribe<YoutubeWebView, LoadVideoByIdCmd>(this, YoutubeWebView.CueVideoByIdMessage);
             MessagingCenter.Instance.Unsubscribe<YoutubeWebView, LoadVideoByIdCmd>(this, YoutubeWebView.LoadVideoByIdMessage);
             MessagingCenter.Instance.Unsubscribe<YoutubeWebView, LoadVideoByUrlCmd>(this, YoutubeWebView.CueVideoByUrlMessage);
@@ -123,15 +153,33 @@ namespace YoutubeInWebView.Droid.Renderer
             Control.EvaluateJavascript("player.stopVideo()", null);
         }
 
-        private void ExecuteSeekToJs()
+        private void ExecuteSeekToJs(SeekToCmd command)
         {
-            Control.EvaluateJavascript("player.seekTo()", null);
+            var json = JsonConvert.SerializeObject(command);
+            Control.EvaluateJavascript($"player.seekTo({json})", null);
         }
 
         private void ExecuteClearVideoJs()
         {
             Control.EvaluateJavascript("player.clearVideo()", null);
         }
+
+
+        private void ExecuteNextVideoJs()
+        {
+            Control.EvaluateJavascript("player.nextVideo()", null);
+        }
+
+        private void ExecutePreviousVideoJs()
+        {
+            Control.EvaluateJavascript("player.previousVideo()", null);
+        }
+
+        private void ExecutePlayVideoAtJs(int index)
+        {
+            Control.EvaluateJavascript($"player.playVideoAt({index})", null);
+        }
+
 
         private void ExecuteCueVideoByIdJs(LoadVideoByIdCmd command)
         {
@@ -167,6 +215,22 @@ namespace YoutubeInWebView.Droid.Renderer
         {
             var json = JsonConvert.SerializeObject(command);
             Control.EvaluateJavascript($"player.loadPlaylist({json})", null);
+        }
+
+
+        private void ExecuteSetSizeJs(int width, int height)
+        {
+            Control.EvaluateJavascript($"player.setSize({width}, {height})", null);
+        }
+
+        private void ExecuteSetVolumeJs(int volume)
+        {
+            Control.EvaluateJavascript($"player.setVolume({volume})", null);
+        }
+
+        private void SetIsMutedJs(bool isMuted)
+        {
+            Control.EvaluateJavascript(isMuted ? "player.mute()" : "player.unMute()", null);
         }
     }
 }

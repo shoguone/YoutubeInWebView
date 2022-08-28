@@ -1,6 +1,7 @@
 ﻿using System;
 using Xamarin.Forms;
 using YoutubeInWebView.UI.Controls;
+using YoutubeInWebView.UI.Controls.Commands;
 
 namespace YoutubeInWebView
 {
@@ -14,6 +15,7 @@ namespace YoutubeInWebView
             PauseButton.Clicked += PauseButton_Clicked;
             StopButton.Clicked += StopButton_Clicked;
             LoadButton.Clicked += LoadButton_Clicked;
+            ChangeSizeButton.Clicked += ChangeSizeButton_Clicked;
         }
 
         private void PlayButton_Clicked(object sender, EventArgs e)
@@ -39,6 +41,11 @@ namespace YoutubeInWebView
                 //EndSeconds = 20,
                 SuggestedQuality = PlaybackQuality.Small,
             });
+        }
+
+        private void ChangeSizeButton_Clicked(object sender, EventArgs e)
+        {
+            Webview.WidthRequest = 200;
         }
     }
 }

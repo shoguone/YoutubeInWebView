@@ -5,11 +5,16 @@
              x:Class="YoutubeInWebView.MainPage">
 
     <StackLayout>
-        <controls:YoutubeWebView x:Name="Webview" YoutubeVideoId="junBvKGZCDc" WidthRequest="400" HeightRequest="600"></controls:YoutubeWebView>
-        <Button Text="Play" x:Name="PlayButton" />
-        <Button Text="Pause" x:Name="PauseButton" />
-        <Button Text="Stop" x:Name="StopButton" />
-        <Button Text="Load" x:Name="LoadButton" />
+        <controls:YoutubeWebView x:Name="Webview" YoutubeVideoId="junBvKGZCDc" WidthRequest="400" HeightRequest="600" HorizontalOptions="Start"></controls:YoutubeWebView>
+        <ScrollView>
+            <StackLayout>
+                <Button Text="Play" x:Name="PlayButton" />
+                <Button Text="Pause" x:Name="PauseButton" />
+                <Button Text="Stop" x:Name="StopButton" />
+                <Button Text="Load" x:Name="LoadButton" />
+                <Button Text="ChangeSize" x:Name="ChangeSizeButton" />
+            </StackLayout>
+        </ScrollView>
     </StackLayout>
 
 </ContentPage>
