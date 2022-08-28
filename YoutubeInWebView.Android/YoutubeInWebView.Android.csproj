@@ -96,9 +96,6 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <AndroidAsset Include="Assets\Content\jquery-3.6.0.min.js" />
-  </ItemGroup>
-  <ItemGroup>
     <AndroidAsset Include="Assets\Content\index.html" />
   </ItemGroup>
   <ItemGroup>

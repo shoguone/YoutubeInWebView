@@ -25,8 +25,9 @@ function setUpPlayer(videoId, w, h) {
         },
         events: {               // https://developers.google.com/youtube/iframe_api_reference#Events
             'onReady': onPlayerReady,
-            'onPlaybackQualityChange': onPlayerPlaybackQualityChange,
             'onStateChange': onPlayerStateChange,
+            'onPlaybackQualityChange': onPlayerPlaybackQualityChange,
+            'onPlaybackRateChange': onPlaybackRateChange,
             'onError': onPlayerError,
         }
     });
@@ -46,10 +47,17 @@ function onPlayerStateChange(event) {
     jsBridge.onPlayerStateChange(event.data);
 }
 
-function onPlayerPlaybackQualityChange(data) {
+function onPlayerPlaybackQualityChange(event) {
     console.log('onPlayerPlaybackQualityChange', JSON.stringify(arguments))
+    jsBridge.onPlayerPlaybackQualityChange(event.data);
 }
 
-function onPlayerError(data) {
+function onPlaybackRateChange(event) {
+    console.log('onPlaybackRateChange', JSON.stringify(arguments))
+    jsBridge.onPlaybackRateChange(event.data);
+}
+
+function onPlayerError(event) {
     console.log('onPlayerError', JSON.stringify(arguments))
+    jsBridge.onPlayerError(event.data);
 }

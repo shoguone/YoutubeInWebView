@@ -50,6 +50,42 @@ namespace YoutubeInWebView.Droid.Javascript
                 ((YoutubeWebView)hybridRenderer.Element).InvokeOnPlayerStateChange((PlayerState)state);
             }
         }
+
+        [JavascriptInterface]
+        [Export("onPlaybackQualityChange")]
+        public void OnPlaybackQualityChange(string quality)
+        {
+            YoutubeWebViewRenderer hybridRenderer;
+
+            if (hybridWebViewRenderer != null && hybridWebViewRenderer.TryGetTarget(out hybridRenderer))
+            {
+                ((YoutubeWebView)hybridRenderer.Element).InvokeOnPlaybackQualityChange(quality);
+            }
+        }
+
+        [JavascriptInterface]
+        [Export("onPlaybackRateChange")]
+        public void OnPlaybackRateChange(int rate)
+        {
+            YoutubeWebViewRenderer hybridRenderer;
+
+            if (hybridWebViewRenderer != null && hybridWebViewRenderer.TryGetTarget(out hybridRenderer))
+            {
+                ((YoutubeWebView)hybridRenderer.Element).InvokeOnPlaybackRateChange(rate);
+            }
+        }
+
+        [JavascriptInterface]
+        [Export("onPlayerError")]
+        public void OnPlayerError(int error)
+        {
+            YoutubeWebViewRenderer hybridRenderer;
+
+            if (hybridWebViewRenderer != null && hybridWebViewRenderer.TryGetTarget(out hybridRenderer))
+            {
+                ((YoutubeWebView)hybridRenderer.Element).InvokeOnPlayerError(error);
+            }
+        }
     }
 }
 
