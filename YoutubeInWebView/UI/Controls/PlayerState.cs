@@ -2,7 +2,7 @@
 {
     public enum PlayerState
     {
-        NOT_STARTED = -1,
+        UNSTARTED = -1,
         ENDED = 0,
         PLAYING = 1,
         PAUSED = 2,

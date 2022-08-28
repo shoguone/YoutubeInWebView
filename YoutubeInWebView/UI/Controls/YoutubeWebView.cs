@@ -1,5 +1,6 @@
 ﻿using System;
 using Xamarin.Forms;
+using YoutubeInWebView.UI.Controls.Commands;
 
 namespace YoutubeInWebView.UI.Controls
 {
@@ -8,6 +9,14 @@ namespace YoutubeInWebView.UI.Controls
         public const string PlayVideoMessage = "PlayVideo";
         public const string PauseVideoMessage = "PauseVideo";
         public const string StopVideoMessage = "StopVideo";
+        public const string SeekToMessage = "SeekTo";
+        public const string ClearVideoMessage = "ClearVideo";
+        public const string CueVideoByIdMessage = "CueVideoById";
+        public const string LoadVideoByIdMessage = "LoadVideoById";
+        public const string CueVideoByUrlMessage = "CueVideoByUrl";
+        public const string LoadVideoByUrlMessage = "LoadVideoByUrl";
+        public const string CuePlaylistMessage = "CuePlaylist";
+        public const string LoadPlaylistMessage = "LoadPlaylist";
 
         public static readonly BindableProperty YoutubeVideoIdProperty = BindableProperty.Create(
             propertyName: nameof(YoutubeVideoId),
@@ -87,6 +96,46 @@ namespace YoutubeInWebView.UI.Controls
         public void StopVideo()
         {
             MessagingCenter.Instance.Send(this, StopVideoMessage);
+        }
+
+        public void SeekTo()
+        {
+            MessagingCenter.Instance.Send(this, SeekToMessage);
+        }
+
+        public void ClearVideo()
+        {
+            MessagingCenter.Instance.Send(this, ClearVideoMessage);
+        }
+
+        public void CueVideoById(LoadVideoByIdCmd command)
+        {
+            MessagingCenter.Instance.Send(this, CueVideoByIdMessage, command);
+        }
+
+        public void LoadVideoById(LoadVideoByIdCmd command)
+        {
+            MessagingCenter.Instance.Send(this, LoadVideoByIdMessage, command);
+        }
+
+        public void CueVideoByUrl(LoadVideoByUrlCmd command)
+        {
+            MessagingCenter.Instance.Send(this, CueVideoByUrlMessage, command);
+        }
+
+        public void LoadVideoByUrl(LoadVideoByUrlCmd command)
+        {
+            MessagingCenter.Instance.Send(this, LoadVideoByUrlMessage, command);
+        }
+
+        public void CuePlaylist(LoadVideoByUrlCmd command)
+        {
+            MessagingCenter.Instance.Send(this, CuePlaylistMessage, command);
+        }
+
+        public void LoadPlaylist(LoadVideoByUrlCmd command)
+        {
+            MessagingCenter.Instance.Send(this, LoadPlaylistMessage, command);
         }
     }
 }

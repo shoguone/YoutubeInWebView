@@ -5,6 +5,8 @@ using YoutubeInWebView.Droid.Renderer;
 using YoutubeInWebView.Droid.Javascript;
 using YoutubeInWebView.UI.Controls;
 using System.ComponentModel;
+using Newtonsoft.Json;
+using YoutubeInWebView.UI.Controls.Commands;
 
 [assembly: ExportRenderer(typeof(YoutubeWebView), typeof(YoutubeWebViewRenderer))]
 namespace YoutubeInWebView.Droid.Renderer
@@ -75,6 +77,20 @@ namespace YoutubeInWebView.Droid.Renderer
             MessagingCenter.Instance.Subscribe<YoutubeWebView>(this, YoutubeWebView.PlayVideoMessage, v => ExecutePlayVideoJs());
             MessagingCenter.Instance.Subscribe<YoutubeWebView>(this, YoutubeWebView.PauseVideoMessage, v => ExecutePauseVideoJs());
             MessagingCenter.Instance.Subscribe<YoutubeWebView>(this, YoutubeWebView.StopVideoMessage, v => ExecuteStopVideoJs());
+            MessagingCenter.Instance.Subscribe<YoutubeWebView>(this, YoutubeWebView.SeekToMessage, v => ExecuteSeekToJs());
+            MessagingCenter.Instance.Subscribe<YoutubeWebView>(this, YoutubeWebView.ClearVideoMessage, v => ExecuteClearVideoJs());
+            MessagingCenter.Instance.Subscribe<YoutubeWebView, LoadVideoByIdCmd>(
+                this, YoutubeWebView.CueVideoByIdMessage, (v, cmd) => ExecuteCueVideoByIdJs(cmd));
+            MessagingCenter.Instance.Subscribe<YoutubeWebView, LoadVideoByIdCmd>(
+                this, YoutubeWebView.LoadVideoByIdMessage, (v, cmd) => ExecuteLoadVideoByIdJs(cmd));
+            MessagingCenter.Instance.Subscribe<YoutubeWebView, LoadVideoByUrlCmd>(
+                this, YoutubeWebView.CueVideoByUrlMessage, (v, cmd) => ExecuteCueVideoByUrlJs(cmd));
+            MessagingCenter.Instance.Subscribe<YoutubeWebView, LoadVideoByUrlCmd>(
+                this, YoutubeWebView.LoadVideoByUrlMessage, (v, cmd) => ExecuteLoadVideoByUrlJs(cmd));
+            MessagingCenter.Instance.Subscribe<YoutubeWebView, LoadPlaylistCmd>(
+                this, YoutubeWebView.CuePlaylistMessage, (v, cmd) => ExecuteCuePlaylistJs(cmd));
+            MessagingCenter.Instance.Subscribe<YoutubeWebView, LoadPlaylistCmd>(
+                this, YoutubeWebView.LoadPlaylistMessage, (v, cmd) => ExecuteLoadPlaylistJs(cmd));
         }
 
         private void UnsubscribeXView()
@@ -82,6 +98,14 @@ namespace YoutubeInWebView.Droid.Renderer
             MessagingCenter.Instance.Unsubscribe<YoutubeWebView>(this, YoutubeWebView.PlayVideoMessage);
             MessagingCenter.Instance.Unsubscribe<YoutubeWebView>(this, YoutubeWebView.PauseVideoMessage);
             MessagingCenter.Instance.Unsubscribe<YoutubeWebView>(this, YoutubeWebView.StopVideoMessage);
+            MessagingCenter.Instance.Unsubscribe<YoutubeWebView>(this, YoutubeWebView.SeekToMessage);
+            MessagingCenter.Instance.Unsubscribe<YoutubeWebView>(this, YoutubeWebView.ClearVideoMessage);
+            MessagingCenter.Instance.Unsubscribe<YoutubeWebView, LoadVideoByIdCmd>(this, YoutubeWebView.CueVideoByIdMessage);
+            MessagingCenter.Instance.Unsubscribe<YoutubeWebView, LoadVideoByIdCmd>(this, YoutubeWebView.LoadVideoByIdMessage);
+            MessagingCenter.Instance.Unsubscribe<YoutubeWebView, LoadVideoByUrlCmd>(this, YoutubeWebView.CueVideoByUrlMessage);
+            MessagingCenter.Instance.Unsubscribe<YoutubeWebView, LoadVideoByUrlCmd>(this, YoutubeWebView.LoadVideoByUrlMessage);
+            MessagingCenter.Instance.Unsubscribe<YoutubeWebView, LoadPlaylistCmd>(this, YoutubeWebView.CuePlaylistMessage);
+            MessagingCenter.Instance.Unsubscribe<YoutubeWebView, LoadPlaylistCmd>(this, YoutubeWebView.LoadPlaylistMessage);
         }
 
         private void ExecutePlayVideoJs()
@@ -99,5 +123,50 @@ namespace YoutubeInWebView.Droid.Renderer
             Control.EvaluateJavascript("player.stopVideo()", null);
         }
 
+        private void ExecuteSeekToJs()
+        {
+            Control.EvaluateJavascript("player.seekTo()", null);
+        }
+
+        private void ExecuteClearVideoJs()
+        {
+            Control.EvaluateJavascript("player.clearVideo()", null);
+        }
+
+        private void ExecuteCueVideoByIdJs(LoadVideoByIdCmd command)
+        {
+            var json = JsonConvert.SerializeObject(command);
+            Control.EvaluateJavascript($"player.cueVideoById({json})", null);
+        }
+
+        private void ExecuteLoadVideoByIdJs(LoadVideoByIdCmd command)
+        {
+            var json = JsonConvert.SerializeObject(command);
+            Control.EvaluateJavascript($"player.loadVideoById({json})", null);
+        }
+
+        private void ExecuteCueVideoByUrlJs(LoadVideoByUrlCmd command)
+        {
+            var json = JsonConvert.SerializeObject(command);
+            Control.EvaluateJavascript($"player.cueVideoByUrl({json})", null);
+        }
+
+        private void ExecuteLoadVideoByUrlJs(LoadVideoByUrlCmd command)
+        {
+            var json = JsonConvert.SerializeObject(command);
+            Control.EvaluateJavascript($"player.loadVideoByUrl({json})", null);
+        }
+
+        private void ExecuteCuePlaylistJs(LoadPlaylistCmd command)
+        {
+            var json = JsonConvert.SerializeObject(command);
+            Control.EvaluateJavascript($"player.cuePlaylist({json})", null);
+        }
+
+        private void ExecuteLoadPlaylistJs(LoadPlaylistCmd command)
+        {
+            var json = JsonConvert.SerializeObject(command);
+            Control.EvaluateJavascript($"player.loadPlaylist({json})", null);
+        }
     }
 }
