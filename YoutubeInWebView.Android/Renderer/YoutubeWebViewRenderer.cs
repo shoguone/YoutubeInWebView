@@ -1,4 +1,6 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.ComponentModel;
+using System.Threading.Tasks;
 using Android.Content;
 using Newtonsoft.Json;
 using Xamarin.Forms;
@@ -15,11 +17,8 @@ namespace YoutubeInWebView.Droid.Renderer
     {
         const string htmlUrl = "file:///android_asset/Content/index.html";
 
-        private readonly Context _context;
-
         public YoutubeWebViewRenderer(Context context) : base(context)
         {
-            _context = context;
         }
 
         private YoutubeWebView _HybridWebView => Element as YoutubeWebView;
@@ -63,7 +62,25 @@ namespace YoutubeInWebView.Droid.Renderer
             }
             else if (e.PropertyName == nameof(YoutubeWebView.IsMuted))
             {
-                SetIsMutedJs(_HybridWebView.IsMuted);
+                ExecuteSetIsMutedJs(_HybridWebView.IsMuted);
+            }
+
+            else if (e.PropertyName == nameof(YoutubeWebView.IsLoop))
+            {
+                ExecuteSetLoopJs(_HybridWebView.IsLoop);
+            }
+            else if (e.PropertyName == nameof(YoutubeWebView.IsShuffle))
+            {
+                ExecuteSetLoopJs(_HybridWebView.IsShuffle);
+            }
+
+            else if (e.PropertyName == nameof(YoutubeWebView.PlaybackRate))
+            {
+                ExecuteSetPlaybackRateJs(_HybridWebView.PlaybackRate);
+            }
+            else if (e.PropertyName == nameof(YoutubeWebView.PlaybackQuality))
+            {
+                ExecuteSetPlaybackQualityJs(_HybridWebView.PlaybackQuality);
             }
         }
 
@@ -116,6 +133,13 @@ namespace YoutubeInWebView.Droid.Renderer
                 this, YoutubeWebView.CuePlaylistMessage, (v, cmd) => ExecuteCuePlaylistJs(cmd));
             MessagingCenter.Instance.Subscribe<YoutubeWebView, LoadPlaylistCmd>(
                 this, YoutubeWebView.LoadPlaylistMessage, (v, cmd) => ExecuteLoadPlaylistJs(cmd));
+
+            _HybridWebView._GetAvailablePlaybackRatesHook += HandleGetAvailablePlaybackRatesCall;
+            _HybridWebView._GetVideoLoadedFractionHook += HandleGetVideoLoadedFractionCall;
+            _HybridWebView._GetAvailableQualityLevelsHook += HandleGetAvailableQualityLevelsCall;
+            _HybridWebView._GetDurationHook += HandleGetDurationCall;
+            _HybridWebView._GetPlaylistHook += HandleGetPlaylistCall;
+            _HybridWebView._GetPlaylistIndexHook += HandleGetPlaylistIndexCall;
         }
 
         private void UnsubscribeXView()
@@ -136,7 +160,15 @@ namespace YoutubeInWebView.Droid.Renderer
             MessagingCenter.Instance.Unsubscribe<YoutubeWebView, LoadVideoByUrlCmd>(this, YoutubeWebView.LoadVideoByUrlMessage);
             MessagingCenter.Instance.Unsubscribe<YoutubeWebView, LoadPlaylistCmd>(this, YoutubeWebView.CuePlaylistMessage);
             MessagingCenter.Instance.Unsubscribe<YoutubeWebView, LoadPlaylistCmd>(this, YoutubeWebView.LoadPlaylistMessage);
+
+            _HybridWebView._GetAvailablePlaybackRatesHook -= HandleGetAvailablePlaybackRatesCall;
+            _HybridWebView._GetVideoLoadedFractionHook -= HandleGetVideoLoadedFractionCall;
+            _HybridWebView._GetAvailableQualityLevelsHook -= HandleGetAvailableQualityLevelsCall;
+            _HybridWebView._GetDurationHook -= HandleGetDurationCall;
+            _HybridWebView._GetPlaylistHook -= HandleGetPlaylistCall;
+            _HybridWebView._GetPlaylistIndexHook -= HandleGetPlaylistIndexCall;
         }
+
 
         private void ExecutePlayVideoJs()
         {
@@ -228,9 +260,73 @@ namespace YoutubeInWebView.Droid.Renderer
             Control.EvaluateJavascript($"player.setVolume({volume})", null);
         }
 
-        private void SetIsMutedJs(bool isMuted)
+        private void ExecuteSetIsMutedJs(bool isMuted)
         {
             Control.EvaluateJavascript(isMuted ? "player.mute()" : "player.unMute()", null);
         }
+
+        private void ExecuteSetLoopJs(bool loopPlaylists)
+        {
+            Control.EvaluateJavascript($"player.setLoop({loopPlaylists})", null);
+        }
+
+        private void ExecuteSetShuffleJs(bool shufflePlaylist)
+        {
+            Control.EvaluateJavascript($"player.setShuffle({shufflePlaylist})", null);
+        }
+
+        private void ExecuteSetPlaybackRateJs(float suggestedRate)
+        {
+            Control.EvaluateJavascript(FormattableString.Invariant($"player.setPlaybackRate({suggestedRate:F1})"), null);
+        }
+
+        private void ExecuteSetPlaybackQualityJs(string suggestedQuality)
+        {
+            Control.EvaluateJavascript($"player.setPlaybackQuality({suggestedQuality})", null);
+        }
+
+
+        private void HandleGetAvailablePlaybackRatesCall(object sender, TaskCompletionSource<float[]> tcs)
+        {
+            var callback = new JsCallback<float[]>();
+            callback.OnResult += (_, val) => tcs.SetResult(val);
+            Control.EvaluateJavascript("player.getAvailablePlaybackRates()", callback);
+        }
+
+        private void HandleGetAvailableQualityLevelsCall(object sender, TaskCompletionSource<string[]> tcs)
+        {
+            var callback = new JsCallback<string[]>();
+            callback.OnResult += (_, val) => tcs.SetResult(val);
+            Control.EvaluateJavascript("player.getAvailableQualityLevels()", callback);
+        }
+
+        private void HandleGetVideoLoadedFractionCall(object sender, TaskCompletionSource<float> tcs)
+        {
+            var callback = new JsCallback<float>();
+            callback.OnResult += (_, val) => tcs.SetResult(val);
+            Control.EvaluateJavascript("player.getVideoLoadedFraction()", callback);
+        }
+
+        private void HandleGetDurationCall(object sender, TaskCompletionSource<float> tcs)
+        {
+            var callback = new JsCallback<float>();
+            callback.OnResult += (_, val) => tcs.SetResult(val);
+            Control.EvaluateJavascript("player.getDuration()", callback);
+        }
+
+        private void HandleGetPlaylistCall(object sender, TaskCompletionSource<string[]> tcs)
+        {
+            var callback = new JsCallback<string[]>();
+            callback.OnResult += (_, val) => tcs.SetResult(val);
+            Control.EvaluateJavascript("player.getPlaylist()", callback);
+        }
+
+        private void HandleGetPlaylistIndexCall(object sender, TaskCompletionSource<int> tcs)
+        {
+            var callback = new JsCallback<int>();
+            callback.OnResult += (_, val) => tcs.SetResult(val);
+            Control.EvaluateJavascript("player.getPlaylistIndex()", callback);
+        }
+
     }
 }

@@ -39,7 +39,7 @@ namespace YoutubeInWebView
                 VideoId = "junBvKGZCDc",
                 StartSeconds = 13,
                 //EndSeconds = 20,
-                SuggestedQuality = PlaybackQuality.Small,
+                SuggestedQuality = PlaybackQualityLevel.Small,
             });
         }
 

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Xamarin.Forms;
 using YoutubeInWebView.UI.Controls.Commands;
 
@@ -41,6 +42,30 @@ namespace YoutubeInWebView.UI.Controls
             declaringType: typeof(YoutubeWebView),
             defaultValue: false);
 
+        public static readonly BindableProperty IsLoopProperty = BindableProperty.Create(
+            propertyName: nameof(IsLoop),
+            returnType: typeof(bool),
+            declaringType: typeof(YoutubeWebView),
+            defaultValue: false);
+
+        public static readonly BindableProperty IsShuffleProperty = BindableProperty.Create(
+            propertyName: nameof(IsShuffle),
+            returnType: typeof(bool),
+            declaringType: typeof(YoutubeWebView),
+            defaultValue: false);
+
+        public static readonly BindableProperty PlaybackRateProperty = BindableProperty.Create(
+            propertyName: nameof(PlaybackRate),
+            returnType: typeof(float),
+            declaringType: typeof(YoutubeWebView),
+            defaultValue: 1f);
+
+        public static readonly BindableProperty PlaybackQualityProperty = BindableProperty.Create(
+            propertyName: nameof(PlaybackQuality),
+            returnType: typeof(string),
+            declaringType: typeof(YoutubeWebView),
+            defaultValue: PlaybackQualityLevel.Default);
+
         public event EventHandler OnPlayerReady;
         public event EventHandler<PlayerState> OnPlayerStateChange;
         public event EventHandler<string> OnPlaybackQualityChange;
@@ -53,6 +78,31 @@ namespace YoutubeInWebView.UI.Controls
         /// 150 - ошибка, аналогичная ошибке 101. Это другой код для ошибки 101.
         /// </summary>
         public event EventHandler<int> OnPlayerError;
+
+        /// <summary>
+        /// Don't call this directly
+        /// </summary>
+        public event EventHandler<TaskCompletionSource<float[]>> _GetAvailablePlaybackRatesHook;
+        /// <summary>
+        /// Don't call this directly
+        /// </summary>
+        public event EventHandler<TaskCompletionSource<string[]>> _GetAvailableQualityLevelsHook;
+        /// <summary>
+        /// Don't call this directly
+        /// </summary>
+        public event EventHandler<TaskCompletionSource<float>> _GetVideoLoadedFractionHook;
+        /// <summary>
+        /// Don't call this directly
+        /// </summary>
+        public event EventHandler<TaskCompletionSource<float>> _GetDurationHook;
+        /// <summary>
+        /// Don't call this directly
+        /// </summary>
+        public event EventHandler<TaskCompletionSource<string[]>> _GetPlaylistHook;
+        /// <summary>
+        /// Don't call this directly
+        /// </summary>
+        public event EventHandler<TaskCompletionSource<int>> _GetPlaylistIndexHook;
 
         public string YoutubeVideoId
         {
@@ -70,6 +120,30 @@ namespace YoutubeInWebView.UI.Controls
         {
             get { return (bool)GetValue(IsMutedProperty); }
             set { SetValue(IsMutedProperty, value); }
+        }
+
+        public bool IsLoop
+        {
+            get { return (bool)GetValue(IsLoopProperty); }
+            set { SetValue(IsLoopProperty, value); }
+        }
+
+        public bool IsShuffle
+        {
+            get { return (bool)GetValue(IsShuffleProperty); }
+            set { SetValue(IsShuffleProperty, value); }
+        }
+
+        public float PlaybackRate
+        {
+            get { return (float)GetValue(PlaybackRateProperty); }
+            set { SetValue(PlaybackRateProperty, value); }
+        }
+
+        public string PlaybackQuality
+        {
+            get { return (string)GetValue(PlaybackQualityProperty); }
+            set { SetValue(PlaybackQualityProperty, value); }
         }
 
         /// <summary>
@@ -182,6 +256,49 @@ namespace YoutubeInWebView.UI.Controls
         public void LoadPlaylist(LoadVideoByUrlCmd command)
         {
             MessagingCenter.Instance.Send(this, LoadPlaylistMessage, command);
+        }
+
+
+        public Task<float[]> GetAvailablePlaybackRatesAsync()
+        {
+            var tcs = new TaskCompletionSource<float[]>();
+            _GetAvailablePlaybackRatesHook?.Invoke(this, tcs);
+            return tcs.Task;
+        }
+
+        public Task<string[]> GetAvailableQualityLevelsAsync()
+        {
+            var tcs = new TaskCompletionSource<string[]>();
+            _GetAvailableQualityLevelsHook?.Invoke(this, tcs);
+            return tcs.Task;
+        }
+
+        public Task<float> GetVideoLoadedFractionAsync()
+        {
+            var tcs = new TaskCompletionSource<float>();
+            _GetVideoLoadedFractionHook?.Invoke(this, tcs);
+            return tcs.Task;
+        }
+
+        public Task<float> GetDurationAsync()
+        {
+            var tcs = new TaskCompletionSource<float>();
+            _GetDurationHook?.Invoke(this, tcs);
+            return tcs.Task;
+        }
+
+        public Task<string[]> GetPlaylistAsync()
+        {
+            var tcs = new TaskCompletionSource<string[]>();
+            _GetPlaylistHook?.Invoke(this, tcs);
+            return tcs.Task;
+        }
+
+        public Task<int> GetPlaylistIndexAsync()
+        {
+            var tcs = new TaskCompletionSource<int>();
+            _GetPlaylistIndexHook?.Invoke(this, tcs);
+            return tcs.Task;
         }
     }
 }
