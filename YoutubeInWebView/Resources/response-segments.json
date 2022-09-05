@@ -1,0 +1,47 @@
+[
+  {
+    "title": "Inception SEG=0 5961.10 5970.80",
+    "video_source": {
+      "type": "youtube",
+      "start_ts": 22.2,
+      "stop_ts": 31.299999999999997,
+      "id": "junBvKGZCDc"
+    }
+  },
+  {
+    "title": "Inception SEG=1 8740.20 8747.40",
+    "video_source": {
+      "type": "youtube",
+      "start_ts": 138.8000000000011,
+      "stop_ts": 145.1000000000011,
+      "id": "ML_f3aV_Vwk"
+    }
+  },
+  {
+    "title": "Inception SEG=2 8422.80 8429.80",
+    "video_source": {
+      "type": "youtube",
+      "start_ts": 566.4999999999989,
+      "stop_ts": 573.4999999999989,
+      "id": "DMutdCJVW-g"
+    }
+  },
+  {
+    "title": "Inception SEG=3 1677.70 1687.00",
+    "video_source": {
+      "type": "youtube",
+      "start_ts": 761.8,
+      "stop_ts": 771,
+      "id": "at0emRjdT2w"
+    }
+  },
+  {
+    "title": "Inception SEG=5 1807.70 1815.30",
+    "video_source": {
+      "type": "youtube",
+      "start_ts": 29,
+      "stop_ts": 36.6,
+      "id": "x9hBWnh_O6A"
+    }
+  }
+]

@@ -9,6 +9,7 @@ using YoutubeInWebView.Droid.Renderer;
 using YoutubeInWebView.Droid.Javascript;
 using YoutubeInWebView.UI.Controls;
 using YoutubeInWebView.UI.Controls.Commands;
+using Xamarin.Essentials;
 
 [assembly: ExportRenderer(typeof(YoutubeWebView), typeof(YoutubeWebViewRenderer))]
 namespace YoutubeInWebView.Droid.Renderer
@@ -27,6 +28,13 @@ namespace YoutubeInWebView.Droid.Renderer
         {
             Device.BeginInvokeOnMainThread(() =>
                 Control.EvaluateJavascript($"setUpPlayer('{_HybridWebView.YoutubeVideoId}', {(int)_HybridWebView.Width}, {(int)_HybridWebView.Height})", null));
+
+        }
+
+        public void UpdateSize()
+        {
+            MainThread.BeginInvokeOnMainThread(() =>
+                ExecuteSetSizeJs((int)_HybridWebView.Width, (int)_HybridWebView.Height));
         }
 
         protected override void OnElementChanged(ElementChangedEventArgs<WebView> e)
@@ -138,6 +146,7 @@ namespace YoutubeInWebView.Droid.Renderer
             _HybridWebView._GetVideoLoadedFractionHook += HandleGetVideoLoadedFractionCall;
             _HybridWebView._GetAvailableQualityLevelsHook += HandleGetAvailableQualityLevelsCall;
             _HybridWebView._GetDurationHook += HandleGetDurationCall;
+            _HybridWebView._GetCurrentTimeHook += HandleGetCurrentTimeCall;
             _HybridWebView._GetPlaylistHook += HandleGetPlaylistCall;
             _HybridWebView._GetPlaylistIndexHook += HandleGetPlaylistIndexCall;
         }
@@ -165,6 +174,7 @@ namespace YoutubeInWebView.Droid.Renderer
             _HybridWebView._GetVideoLoadedFractionHook -= HandleGetVideoLoadedFractionCall;
             _HybridWebView._GetAvailableQualityLevelsHook -= HandleGetAvailableQualityLevelsCall;
             _HybridWebView._GetDurationHook -= HandleGetDurationCall;
+            _HybridWebView._GetCurrentTimeHook -= HandleGetCurrentTimeCall;
             _HybridWebView._GetPlaylistHook -= HandleGetPlaylistCall;
             _HybridWebView._GetPlaylistIndexHook -= HandleGetPlaylistIndexCall;
         }
@@ -312,6 +322,13 @@ namespace YoutubeInWebView.Droid.Renderer
             var callback = new JsCallback<float>();
             callback.OnResult += (_, val) => tcs.SetResult(val);
             Control.EvaluateJavascript("player.getDuration()", callback);
+        }
+
+        private void HandleGetCurrentTimeCall(object sender, TaskCompletionSource<float> tcs)
+        {
+            var callback = new JsCallback<float>();
+            callback.OnResult += (_, val) => tcs.SetResult(val);
+            Control.EvaluateJavascript("player.getCurrentTime()", callback);
         }
 
         private void HandleGetPlaylistCall(object sender, TaskCompletionSource<string[]> tcs)

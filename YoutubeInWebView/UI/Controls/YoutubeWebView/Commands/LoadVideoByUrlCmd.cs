@@ -2,16 +2,16 @@
 
 namespace YoutubeInWebView.UI.Controls.Commands
 {
-    public class LoadVideoByIdCmd
+    public class LoadVideoByUrlCmd
     {
-        [JsonProperty("videoId")]
-        public string VideoId { get; set; }
+        [JsonProperty("mediaContentUrl")]
+        public string MediaContentUrl { get; set; }
 
         [JsonProperty("startSeconds")]
-        public int StartSeconds { get; set; }
+        public float StartSeconds { get; set; }
 
         [JsonProperty("endSeconds")]
-        public int EndSeconds { get; set; }
+        public float EndSeconds { get; set; }
 
         [JsonProperty("suggestedQuality")]
         public string SuggestedQuality { get; set; }

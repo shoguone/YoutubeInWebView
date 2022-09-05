@@ -35,6 +35,7 @@ namespace YoutubeInWebView.Droid.Javascript
 
             if (hybridWebViewRenderer != null && hybridWebViewRenderer.TryGetTarget(out hybridRenderer))
             {
+                hybridRenderer.UpdateSize();
                 ((YoutubeWebView)hybridRenderer.Element).InvokeOnPlayerReady();
             }
         }

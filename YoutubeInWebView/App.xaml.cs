@@ -1,6 +1,5 @@
-﻿using System;
-using Xamarin.Forms;
-using Xamarin.Forms.Xaml;
+﻿using Xamarin.Forms;
+using YoutubeInWebView.Services;
 
 namespace YoutubeInWebView
 {
@@ -9,6 +8,8 @@ namespace YoutubeInWebView
         public App()
         {
             InitializeComponent();
+
+            DependencyService.RegisterSingleton(new VideoRepository());
 
             MainPage = new MainPage();
         }

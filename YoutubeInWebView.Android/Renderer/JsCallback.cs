@@ -10,8 +10,15 @@ namespace YoutubeInWebView.Droid.Renderer
 
         public void OnReceiveValue(Java.Lang.Object value)
         {
-            var result = JsonConvert.DeserializeObject<T>(value.ToString());
-            OnResult?.Invoke(this, result);
+            try
+            {
+                var result = JsonConvert.DeserializeObject<T>(value.ToString());
+                OnResult?.Invoke(this, result);
+            }
+            catch (Exception)
+            {
+                // HACK : value == null check doesn't work with Java.Lang.Object so here is try/catch
+            }
         }
     }
 }

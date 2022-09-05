@@ -1,7 +1,7 @@
 ﻿using System;
+using System.Linq;
 using Xamarin.Forms;
-using YoutubeInWebView.UI.Controls;
-using YoutubeInWebView.UI.Controls.Commands;
+using YoutubeInWebView.Services;
 
 namespace YoutubeInWebView
 {
@@ -14,38 +14,33 @@ namespace YoutubeInWebView
             PlayButton.Clicked += PlayButton_Clicked;
             PauseButton.Clicked += PauseButton_Clicked;
             StopButton.Clicked += StopButton_Clicked;
-            LoadButton.Clicked += LoadButton_Clicked;
+            
             ChangeSizeButton.Clicked += ChangeSizeButton_Clicked;
+
+            var repo = DependencyService.Get<VideoRepository>();
+            var videos = repo.GetVideos();
+            TimelineView.Init(videos.ToList(), YtPlayerWebview);
+
         }
 
         private void PlayButton_Clicked(object sender, EventArgs e)
         {
-            Webview.PlayVideo();
+            YtPlayerWebview.PlayVideo();
         }
 
         private void PauseButton_Clicked(object sender, EventArgs e)
         {
-            Webview.PauseVideo();
+            YtPlayerWebview.PauseVideo();
         }
 
         private void StopButton_Clicked(object sender, EventArgs e)
         {
-            Webview.StopVideo();
-        }
-
-        private void LoadButton_Clicked(object sender, EventArgs e)
-        {
-            Webview.LoadVideoById(new LoadVideoByIdCmd {
-                VideoId = "junBvKGZCDc",
-                StartSeconds = 13,
-                //EndSeconds = 20,
-                SuggestedQuality = PlaybackQualityLevel.Small,
-            });
+            YtPlayerWebview.StopVideo();
         }
 
         private void ChangeSizeButton_Clicked(object sender, EventArgs e)
         {
-            Webview.WidthRequest = 200;
+            YtPlayerWebview.WidthRequest = 200;
         }
     }
 }

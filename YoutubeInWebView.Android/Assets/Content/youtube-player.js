@@ -26,7 +26,7 @@ function setUpPlayer(videoId, w, h) {
         events: {               // https://developers.google.com/youtube/iframe_api_reference#Events
             'onReady': onPlayerReady,
             'onStateChange': onPlayerStateChange,
-            'onPlaybackQualityChange': onPlayerPlaybackQualityChange,
+            'onPlaybackQualityChange': onPlaybackQualityChange,
             'onPlaybackRateChange': onPlaybackRateChange,
             'onError': onPlayerError,
         }
@@ -47,9 +47,9 @@ function onPlayerStateChange(event) {
     jsBridge.onPlayerStateChange(event.data);
 }
 
-function onPlayerPlaybackQualityChange(event) {
-    console.log('onPlayerPlaybackQualityChange', JSON.stringify(arguments))
-    jsBridge.onPlayerPlaybackQualityChange(event.data);
+function onPlaybackQualityChange(event) {
+    console.log('onPlaybackQualityChange', JSON.stringify(arguments))
+    jsBridge.onPlaybackQualityChange(event.data);
 }
 
 function onPlaybackRateChange(event) {

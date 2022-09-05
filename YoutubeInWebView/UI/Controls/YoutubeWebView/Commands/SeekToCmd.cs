@@ -5,7 +5,7 @@ namespace YoutubeInWebView.UI.Controls.Commands
     public class SeekToCmd
     {
         [JsonProperty("seconds")]
-        public int Seconds { get; set; }
+        public float Seconds { get; set; }
 
         [JsonProperty("allowSeekAhead")]
         public bool AllowSeekAhead { get; set; }

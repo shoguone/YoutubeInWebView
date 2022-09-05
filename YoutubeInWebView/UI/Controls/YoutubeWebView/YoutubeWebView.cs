@@ -24,6 +24,16 @@ namespace YoutubeInWebView.UI.Controls
         public const string CuePlaylistMessage = "CuePlaylist";
         public const string LoadPlaylistMessage = "LoadPlaylist";
 
+        private static readonly TimeSpan UpdateDurationInterval = TimeSpan.FromSeconds(1);
+
+        private bool _doUpdateCurrentTime = true;
+        private bool _isPlayerReady = false;
+
+        public YoutubeWebView()
+        {
+            Device.StartTimer(UpdateDurationInterval, UpdateCurrentTime);
+        }
+
         public static readonly BindableProperty YoutubeVideoIdProperty = BindableProperty.Create(
             propertyName: nameof(YoutubeVideoId),
             returnType: typeof(string),
@@ -70,12 +80,15 @@ namespace YoutubeInWebView.UI.Controls
         public event EventHandler<PlayerState> OnPlayerStateChange;
         public event EventHandler<string> OnPlaybackQualityChange;
         public event EventHandler<int> OnPlaybackRateChange;
+        public event EventHandler<float> OnCurrentTimeUpdate;
+
         /// <summary>
-        /// 2 - запрос содержит недопустимое значение параметра. Например, ошибка возникает при указании идентификатора видео, состоящего из менее 11 символов или содержащего недопустимые символы (восклицательный знак, символ звездочки и т. д.).
-        /// 5 - ошибка воспроизведения запрошенного содержимого в проигрывателе HTML или другая ошибка, связанная с работой проигрывателя HTML.
-        /// 100 - запрошенное видео не найдено. Эта ошибка возникает, если видео было удалено (по любой причине) или помечено как частное.
-        /// 101 - владелец запрошенного видео запретил его воспроизведение во встроенных проигрывателях.
-        /// 150 - ошибка, аналогичная ошибке 101. Это другой код для ошибки 101.
+        /// From iframe_api_reference:
+        /// <br/>2 – The request contains an invalid parameter value. For example, this error occurs if you specify a video ID that does not have 11 characters, or if the video ID contains invalid characters, such as exclamation points or asterisks.
+        /// <br/>5 – The requested content cannot be played in an HTML5 player or another error related to the HTML5 player has occurred.
+        /// <br/>100 – The video requested was not found. This error occurs when a video has been removed (for any reason) or has been marked as private.
+        /// <br/>101 – The owner of the requested video does not allow it to be played in embedded players.
+        /// <br/>150 – This error is the same as 101. It's just a 101 error in disguise!
         /// </summary>
         public event EventHandler<int> OnPlayerError;
 
@@ -83,22 +96,32 @@ namespace YoutubeInWebView.UI.Controls
         /// Don't call this directly
         /// </summary>
         public event EventHandler<TaskCompletionSource<float[]>> _GetAvailablePlaybackRatesHook;
+
         /// <summary>
         /// Don't call this directly
         /// </summary>
         public event EventHandler<TaskCompletionSource<string[]>> _GetAvailableQualityLevelsHook;
+
         /// <summary>
         /// Don't call this directly
         /// </summary>
         public event EventHandler<TaskCompletionSource<float>> _GetVideoLoadedFractionHook;
+
         /// <summary>
         /// Don't call this directly
         /// </summary>
         public event EventHandler<TaskCompletionSource<float>> _GetDurationHook;
+
+        /// <summary>
+        /// Don't call this directly
+        /// </summary>
+        public event EventHandler<TaskCompletionSource<float>> _GetCurrentTimeHook;
+
         /// <summary>
         /// Don't call this directly
         /// </summary>
         public event EventHandler<TaskCompletionSource<string[]>> _GetPlaylistHook;
+
         /// <summary>
         /// Don't call this directly
         /// </summary>
@@ -106,44 +129,44 @@ namespace YoutubeInWebView.UI.Controls
 
         public string YoutubeVideoId
         {
-            get { return (string)GetValue(YoutubeVideoIdProperty); }
-            set { SetValue(YoutubeVideoIdProperty, value); }
+            get => (string) GetValue(YoutubeVideoIdProperty);
+            set => SetValue(YoutubeVideoIdProperty, value);
         }
 
         public int Volume
         {
-            get { return (int)GetValue(VolumeProperty); }
-            set { SetValue(VolumeProperty, value); }
+            get => (int) GetValue(VolumeProperty);
+            set => SetValue(VolumeProperty, value);
         }
 
         public bool IsMuted
         {
-            get { return (bool)GetValue(IsMutedProperty); }
-            set { SetValue(IsMutedProperty, value); }
+            get => (bool) GetValue(IsMutedProperty);
+            set => SetValue(IsMutedProperty, value);
         }
 
         public bool IsLoop
         {
-            get { return (bool)GetValue(IsLoopProperty); }
-            set { SetValue(IsLoopProperty, value); }
+            get => (bool) GetValue(IsLoopProperty);
+            set => SetValue(IsLoopProperty, value);
         }
 
         public bool IsShuffle
         {
-            get { return (bool)GetValue(IsShuffleProperty); }
-            set { SetValue(IsShuffleProperty, value); }
+            get => (bool) GetValue(IsShuffleProperty);
+            set => SetValue(IsShuffleProperty, value);
         }
 
         public float PlaybackRate
         {
-            get { return (float)GetValue(PlaybackRateProperty); }
-            set { SetValue(PlaybackRateProperty, value); }
+            get => (float) GetValue(PlaybackRateProperty);
+            set => SetValue(PlaybackRateProperty, value);
         }
 
         public string PlaybackQuality
         {
-            get { return (string)GetValue(PlaybackQualityProperty); }
-            set { SetValue(PlaybackQualityProperty, value); }
+            get => (string) GetValue(PlaybackQualityProperty);
+            set => SetValue(PlaybackQualityProperty, value);
         }
 
         /// <summary>
@@ -151,6 +174,7 @@ namespace YoutubeInWebView.UI.Controls
         /// </summary>
         public void InvokeOnPlayerReady()
         {
+            _isPlayerReady = true;
             OnPlayerReady?.Invoke(this, EventArgs.Empty);
         }
 
@@ -248,12 +272,12 @@ namespace YoutubeInWebView.UI.Controls
             MessagingCenter.Instance.Send(this, LoadVideoByUrlMessage, command);
         }
 
-        public void CuePlaylist(LoadVideoByUrlCmd command)
+        public void CuePlaylist(LoadPlaylistCmd command)
         {
             MessagingCenter.Instance.Send(this, CuePlaylistMessage, command);
         }
 
-        public void LoadPlaylist(LoadVideoByUrlCmd command)
+        public void LoadPlaylist(LoadPlaylistCmd command)
         {
             MessagingCenter.Instance.Send(this, LoadPlaylistMessage, command);
         }
@@ -287,6 +311,13 @@ namespace YoutubeInWebView.UI.Controls
             return tcs.Task;
         }
 
+        public Task<float> GetCurrentTimeAsync()
+        {
+            var tcs = new TaskCompletionSource<float>();
+            _GetCurrentTimeHook?.Invoke(this, tcs);
+            return tcs.Task;
+        }
+
         public Task<string[]> GetPlaylistAsync()
         {
             var tcs = new TaskCompletionSource<string[]>();
@@ -299,6 +330,13 @@ namespace YoutubeInWebView.UI.Controls
             var tcs = new TaskCompletionSource<int>();
             _GetPlaylistIndexHook?.Invoke(this, tcs);
             return tcs.Task;
+        }
+
+        private bool UpdateCurrentTime()
+        {
+            if (_isPlayerReady)
+                GetCurrentTimeAsync().ContinueWith(t => OnCurrentTimeUpdate?.Invoke(this, t.Result));
+            return _doUpdateCurrentTime;
         }
     }
 }
