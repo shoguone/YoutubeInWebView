@@ -2,45 +2,50 @@
 using System.Linq;
 using Xamarin.Forms;
 using YoutubeInWebView.Services;
+using YoutubeInWebView.UI.Controls;
 
 namespace YoutubeInWebView
 {
     public partial class MainPage : ContentPage
     {
+        private PlayerState _state;
+
         public MainPage()
         {
             InitializeComponent();
 
-            PlayButton.Clicked += PlayButton_Clicked;
-            PauseButton.Clicked += PauseButton_Clicked;
-            StopButton.Clicked += StopButton_Clicked;
-            
-            ChangeSizeButton.Clicked += ChangeSizeButton_Clicked;
+            PlayButton.Clicked += PlayPause;
+            NextButton.Clicked += NextButton_Clicked;
+            PreviousButton.Clicked += PreviousButton_Clicked;
 
             var repo = DependencyService.Get<VideoRepository>();
             var videos = repo.GetVideos();
             TimelineView.Init(videos.ToList(), YtPlayerWebview);
 
+            YtPlayerWebview.OnPlayerStateChange += YoutubeWebView_OnPlayerStateChange;
         }
 
-        private void PlayButton_Clicked(object sender, EventArgs e)
+        private void PreviousButton_Clicked(object sender, EventArgs e)
         {
-            YtPlayerWebview.PlayVideo();
+            TimelineView.Previous();
         }
 
-        private void PauseButton_Clicked(object sender, EventArgs e)
+        private void NextButton_Clicked(object sender, EventArgs e)
         {
-            YtPlayerWebview.PauseVideo();
+            TimelineView.Next();
         }
 
-        private void StopButton_Clicked(object sender, EventArgs e)
+        private void YoutubeWebView_OnPlayerStateChange(object sender, PlayerState playerState)
         {
-            YtPlayerWebview.StopVideo();
+            _state = playerState;
         }
 
-        private void ChangeSizeButton_Clicked(object sender, EventArgs e)
+        public void PlayPause(object sender, EventArgs e)
         {
-            YtPlayerWebview.WidthRequest = 200;
+            if (_state == PlayerState.PAUSED)
+                YtPlayerWebview.PlayVideo();
+            if (_state == PlayerState.PLAYING)
+                YtPlayerWebview.PauseVideo();
         }
     }
 }
