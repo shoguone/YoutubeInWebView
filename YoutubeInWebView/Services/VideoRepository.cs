@@ -16,6 +16,12 @@ namespace YoutubeInWebView.Services
 
         public IEnumerable<VideoDto> GetVideos() => _videoDtos;
 
+        public void UpdateVideos(List<SegmentDto> segmentDtos)
+        {
+            var i = 0;
+            _videoDtos = segmentDtos.Select(s => VideoDto.FromSegmentDto(s, i++));
+        }
+
         private IEnumerable<VideoDto> LoadVideos()
         {
             var fileHelper = new FileHelper();
