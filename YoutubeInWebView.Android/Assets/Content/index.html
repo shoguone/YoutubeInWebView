@@ -1,8 +1,134 @@
 ﻿<!DOCTYPE html>
 <html>
+<head>
+    <style type="text/css">
+        body {
+            background-color: #333;
+        }
+
+        #player-wrapper {
+            position: relative;
+            display: inline-flex;
+        }
+
+            #player-wrapper button {
+                background-color: transparent;
+                cursor: pointer;
+                outline: none;
+                border: none;
+                z-index: 20;
+            }
+
+                #player-wrapper button svg path,
+                #player-wrapper button svg rect {
+                    fill: #bbb;
+                }
+
+            #player-wrapper.no-displayed button {
+                opacity: 0;
+                pointer-events: none;
+            }
+
+        #button-play, #button-pause {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translateX(-50%) translateY(-50%);
+        }
+
+        #button-play {
+            z-index: 22;
+        }
+
+        #button-pause {
+            display: none;
+            z-index: 21;
+        }
+
+        #button-next {
+            position: absolute;
+            right: 10%;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 22;
+        }
+
+        #button-prev {
+            position: absolute;
+            left: 10%;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 22;
+        }
+    </style>
+</head>
 <body>
-    <!-- 1. The <iframe> (and video player) will replace this <div> tag. -->
-    <div id="player"></div>
+    <div id="player-wrapper">
+        <!-- 1. The <iframe> (and video player) will replace this <div> tag. -->
+        <div id="player"></div>
+        <button id="button-prev">
+            <svg width="21" height="25" viewBox="0 0 21 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M4.49373 12.081C3.82691 12.4659 3.82691 13.4283 4.49373 13.8132L18.7741 22.0555C19.4408 22.4403 20.274 21.9592 20.274 21.1894L20.274 4.70481C20.274 3.93507 19.4408 3.45394 18.7741 3.83872L4.49373 12.081Z" fill="white" />
+                <rect y="0.97821" width="1.99542" height="23.9378" rx="0.997711" fill="white" />
+            </svg>
+        </button>
+        <button id="button-play">
+            <svg width="56" height="56" viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <mask id="mask0_2945_934" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="0" y="0" width="56" height="56">
+                    <ellipse opacity="0.4" cx="27.6563" cy="27.5171" rx="27.5083" ry="27.5" fill="white" />
+                </mask>
+                <g mask="url(#mask0_2945_934)">
+                    <g filter="url(#filter0_f_2945_934)">
+                        <rect width="149.532" height="149.487" transform="translate(-47.1099 -47.2265)" fill="url(#paint0_linear_2945_934)" fill-opacity="0.7" />
+                    </g>
+                </g>
+                <path d="M39.3388 26.0811C40.0056 26.4659 40.0056 27.4284 39.3388 27.8132L21.6022 38.0504C20.9355 38.4351 20.1023 37.954 20.1023 37.1843L20.1023 16.71C20.1023 15.9403 20.9355 15.4592 21.6022 15.8439L39.3388 26.0811Z" fill="white" />
+                <defs>
+                    <filter id="filter0_f_2945_934" x="-72.1099" y="-72.2265" width="199.532" height="199.487" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+                        <feFlood flood-opacity="0" result="BackgroundImageFix" />
+                        <feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape" />
+                        <feGaussianBlur stdDeviation="12.5" result="effect1_foregroundBlur_2945_934" />
+                    </filter>
+                    <linearGradient id="paint0_linear_2945_934" x1="88.6629" y1="45.7474" x2="54.2579" y2="108.094" gradientUnits="userSpaceOnUse">
+                        <stop stop-color="#FFF5F5" />
+                        <stop offset="1" stop-color="white" />
+                    </linearGradient>
+                </defs>
+            </svg>
+
+        </button>
+        <button id="button-pause">
+            <svg width="56" height="55" viewBox="0 0 56 55" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <mask id="mask0_2945_179" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="0" y="0" width="56" height="55">
+                    <ellipse opacity="0.4" cx="27.6565" cy="27.5" rx="27.5083" ry="27.5" fill="white" />
+                </mask>
+                <g mask="url(#mask0_2945_179)">
+                    <g filter="url(#filter0_f_2945_179)">
+                        <rect width="149.532" height="149.487" transform="translate(-47.1096 -47.2435)" fill="url(#paint0_linear_2945_179)" fill-opacity="0.7" />
+                    </g>
+                </g>
+                <path d="M20 16C20 15.4477 20.4477 15 21 15H23C23.5523 15 24 15.4477 24 16V38C24 38.5523 23.5523 39 23 39H21C20.4477 39 20 38.5523 20 38V16Z" fill="white" />
+                <path d="M31 16C31 15.4477 31.4477 15 32 15H34C34.5523 15 35 15.4477 35 16V38C35 38.5523 34.5523 39 34 39H32C31.4477 39 31 38.5523 31 38V16Z" fill="white" />
+                <defs>
+                    <filter id="filter0_f_2945_179" x="-72.1096" y="-72.2435" width="199.532" height="199.487" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+                        <feFlood flood-opacity="0" result="BackgroundImageFix" />
+                        <feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape" />
+                        <feGaussianBlur stdDeviation="12.5" result="effect1_foregroundBlur_2945_179" />
+                    </filter>
+                    <linearGradient id="paint0_linear_2945_179" x1="88.6629" y1="45.7474" x2="54.2579" y2="108.094" gradientUnits="userSpaceOnUse">
+                        <stop stop-color="#FFF5F5" />
+                        <stop offset="1" stop-color="white" />
+                    </linearGradient>
+                </defs>
+            </svg>
+
+        </button>
+        <button id="button-next">
+            <svg width="17" height="25" viewBox="0 0 17 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path fill-rule="evenodd" clip-rule="evenodd" d="M16.0025 0.978241C15.4515 0.978241 15.0048 1.42493 15.0048 1.97595V11.279L1.25142 3.08492C1.12868 3.0118 0.989383 2.97322 0.847553 2.97308C0.705724 2.97294 0.566358 3.01123 0.443473 3.0841C0.320588 3.15698 0.218518 3.26187 0.147526 3.38822C0.0765347 3.51458 0.0391259 3.65794 0.0390625 3.8039V22.0901C0.0390625 22.3105 0.124159 22.5219 0.275633 22.6778C0.427106 22.8337 0.632548 22.9213 0.846763 22.9213C0.988904 22.9212 1.12851 22.8825 1.25142 22.8091L15.0048 14.615V23.9184C15.0048 24.4694 15.4515 24.9161 16.0025 24.9161C16.5536 24.9161 17.0002 24.4694 17.0002 23.9184V1.97595C17.0002 1.42493 16.5536 0.978241 16.0025 0.978241Z" fill="white" />
+            </svg>
+        </button>
+    </div>
 
     <script src="https://www.youtube.com/iframe_api"></script>
     <script src="youtube-player.js"></script>

@@ -19,6 +19,7 @@ function setUpPlayer(videoId, w, h) {
             showinfo: 0,
             loop: 0,
             fs: 0,
+            disablekb: 1,
             hl: 'en',
             playsinline: 1,
             enablejsapi: 1,
@@ -44,6 +45,9 @@ function onPlayerReady(event) {
 //    the player should play for six seconds and then stop.
 function onPlayerStateChange(event) {
     console.log('onPlayerStateChange', JSON.stringify(arguments))
+
+    switchPlayPauseButtons(event.data == YT.PlayerState.PLAYING);
+
     jsBridge.onPlayerStateChange(event.data);
 }
 
@@ -60,4 +64,68 @@ function onPlaybackRateChange(event) {
 function onPlayerError(event) {
     console.log('onPlayerError', JSON.stringify(arguments))
     jsBridge.onPlayerError(event.data);
+}
+
+///////////////////
+// buttons handling
+///////////////////
+
+const _playerWrapperEl = document.getElementById('player-wrapper');
+
+const btnPlay = document.getElementById('button-play');
+const btnPause = document.getElementById('button-pause');
+const btnNext = document.getElementById('button-next');
+const btnPrev = document.getElementById('button-prev');
+
+let timer = null;
+
+_playerWrapperEl.addEventListener('mouseenter', () => {
+    _playerWrapperEl.classList.add('is-showed-controls');
+    _playerWrapperEl.classList.remove('no-displayed');
+});
+
+_playerWrapperEl.addEventListener('mouseleave', () => {
+    clearTimeout(timer);
+    timer = setTimeout(() => {
+        _playerWrapperEl.classList.add('no-displayed');
+        _playerWrapperEl.classList.remove('is-showed-controls');
+    }, 3000);
+});
+
+btnPlay.addEventListener('click', onBtnPlay);
+btnPause.addEventListener('click', onBtnPause);
+btnNext.addEventListener('click', onBtnNext);
+btnPrev.addEventListener('click', onBtnPrev);
+
+function onBtnPlay() {
+    console.log('btnPlay');
+    player.playVideo();
+    switchPlayPauseButtons(true);
+}
+
+function onBtnPause() {
+    console.log('btnPause');
+    player.pauseVideo();
+    switchPlayPauseButtons(false);
+}
+
+function onBtnNext() {
+    console.log('btnNext');
+    player.nextVideo();
+}
+
+function onBtnPrev() {
+    console.log('btnPrev');
+    player.previousVideo();
+}
+
+function switchPlayPauseButtons(isPlaying) {
+    if (isPlaying) {
+        btnPause.style.display = 'flex';
+        btnPlay.style.display = 'none';
+    }
+    else {
+        btnPlay.style.display = 'flex';
+        btnPause.style.display = 'none';
+    }
 }
